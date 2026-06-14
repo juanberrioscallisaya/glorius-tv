@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glorius Exchange — TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @keyframes ticker {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+    @keyframes glow {
+      0%, 100% { opacity: 0.8; }
+      50%       { opacity: 1; }
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 6px #00ff66; }
+      50%       { box-shadow: 0 0 18px #00ff66, 0 0 36px #00ff6660; }
+    }
+    @keyframes borderGlow {
+      0%, 100% { box-shadow: 0 0 8px #00ff6640, inset 0 0 8px #00ff6610; }
+      50%       { box-shadow: 0 0 22px #00ff6680, inset 0 0 14px #00ff6620; }
+    }
+    @keyframes flash {
+      0%   { background: rgba(0,255,102,0.25); }
+      100% { background: transparent; }
+    }
+    @keyframes scanline {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #020c1a;
+      color: white;
+      font-family: 'Rajdhani', 'Arial Black', sans-serif;
+      user-select: none;
+    }
+
+    .wrap {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      background:
+        linear-gradient(135deg, rgba(0,255,102,0.03) 0%, transparent 50%, rgba(0,217,255,0.03) 100%),
+        linear-gradient(rgba(2,12,26,0.55), rgba(3,22,46,0.60)),
+        url('worldmap.png') center/cover no-repeat;
+      position: relative;
+    }
+
+    .wrap::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 60px;
+      background: linear-gradient(transparent, rgba(0,255,102,0.04), transparent);
+      animation: scanline 6s linear infinite;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      height: 12vh; min-height: 80px;
+      background: linear-gradient(90deg, #020f20 0%, #031d3a 50%, #020f20 100%);
+      border-bottom: 3px solid #00ff66;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5vw; flex-shrink: 0;
+      box-shadow: 0 4px 40px #00ff6630;
+      position: relative; z-index: 1;
+    }
+
+    .logo-wrap { display: flex; align-items: center; gap: 1.8vw; }
+    .logo {
+      width: 10vh; height: 10vh; min-width: 64px; min-height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #0d2a1a, #020c14);
+      border: 2px solid #00ff6666;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+      animation: borderGlow 3s infinite;
+      box-shadow: 0 0 20px #00ff6630;
+    }
+    .logo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .title-main {
+      color: #00ff66;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(16px, 2.8vw, 52px);
+      line-height: 1.15;
+      text-shadow: 0 0 20px rgba(0,255,102,0.5);
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+    .title-sub {
+      font-size: clamp(12px, 1.5vw, 30px);
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: #a0c8e8;
+    }
+
+    .clock-wrap { text-align: right; }
+    .clock {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(20px, 3.2vw, 58px);
+      font-weight: 700;
+      text-shadow: 0 0 20px #ffffff80;
+      letter-spacing: 4px;
+    }
+    .city {
+      color: #00ff66;
+      font-size: clamp(11px, 1.3vw, 26px);
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-shadow: 0 0 10px #00ff6660;
+    }
+
+    /* ── BODY ── */
+    .body {
+      flex: 1; display: flex;
+      padding: 0.6vh 0.8vw; gap: 0.8vw;
+      min-height: 0; position: relative; z-index: 1;
+      align-items: stretch;
+    }
+
+    /* ── TABLA MONEDAS ── */
+    .table-panel {
+      flex: 1;
+      background: linear-gradient(180deg, rgba(0,25,55,0.42) 0%, rgba(0,15,35,0.52) 100%);
+      border-radius: 16px;
+      border: 2px solid #00406680;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px #00204840;
+    }
+
+    .t-header {
+      display: grid; grid-template-columns: 2.3fr 0.8fr 0.8fr;
+      background: linear-gradient(90deg, #021830, #042349, #021830);
+      padding: 0.9vh 1vw;
+      font-weight: 700; align-items: center;
+      flex-shrink: 0;
+      border-bottom: 1px solid #00406680;
+    }
+    .t-col-m { font-size: clamp(14px, 2vw, 38px); color: #ffffff; }
+    .t-col-c {
+      color: #00ff66; font-size: clamp(13px, 1.8vw, 34px);
+      text-align: center; text-shadow: 0 0 14px #00ff66; letter-spacing: 1px;
+    }
+    .t-col-v {
+      color: #00d9ff; font-size: clamp(13px, 1.9vw, 36px);
+      text-align: center; text-shadow: 0 0 14px #00d9ff; letter-spacing: 1px;
+    }
+
+    .rows { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .row {
+      display: grid; grid-template-columns: 2.3fr 0.8fr 0.8fr;
+      align-items: center;
+      border-top: 1px solid #ffffff08;
+      flex: 1;
+    }
+    .row:nth-child(even) { background: rgba(0,60,120,0.08); }
+    .row.updated { animation: flash 1s ease-out; }
+
+    .coin-cell { display: flex; align-items: center; gap: 0.8vw; padding-left: 0.8vw; }
+    .num {
+      color: #4ade80; font-weight: 700;
+      font-size: clamp(14px, 1.8vw, 34px);
+      width: 1.8vw; flex-shrink: 0;
+    }
+    .flag {
+      width: clamp(38px, 5.5vh, 74px); height: clamp(38px, 5.5vh, 74px);
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      overflow: hidden; flex-shrink: 0;
+      box-shadow: 0 2px 10px #00000060;
+    }
+    .flag img { width: 100%; height: 100%; object-fit: cover; }
+    .coin-code {
+      color: #00ff66; font-weight: 700;
+      font-size: clamp(16px, 2.2vw, 42px);
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px #00ff6650;
+      width: clamp(60px, 8vw, 140px);
+    }
+    .coin-name {
+      color: #e0f0ff;
+      font-size: clamp(12px, 1.5vw, 28px);
+      font-weight: 700; letter-spacing: 1px;
+    }
+    .live-tag {
+      font-size: clamp(8px, 0.7vw, 12px);
+      color: #00d9ff; opacity: 0.7;
+      letter-spacing: 2px;
+    }
+
+    .price-box { display: flex; justify-content: center; padding: 2px 4px; }
+    .price-val {
+      width: 92%; height: clamp(34px, 5vh, 68px);
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6640;
+      border-radius: 10px;
+      text-align: center; color: white; font-weight: 700;
+      font-size: clamp(16px, 2.2vw, 42px);
+      box-shadow: 0 0 12px #00ff6630, inset 0 1px 0 #ffffff20;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── PANEL DERECHO ── */
+    .right-panel {
+      width: clamp(300px, 34vw, 660px);
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 0.6vh;
+    }
+
+    /* TV VIDEO */
+    .tv-box {
+      background: #00152fdd;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid #00ff66;
+      flex-shrink: 0;
+    }
+    .tv-label {
+      background: #008c33;
+      padding: 0.7vh 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: clamp(12px, 1.1vw, 20px);
+      letter-spacing: 3px;
+    }
+    .tv-frame {
+      width: 100%; aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+    .tv-frame iframe {
+      width: 100%; height: 100%; border: none; display: block;
+    }
+
+    /* INFO MERCADO */
+    .info-box {
+      flex: 1;
+      background: #00152fdd;
+      border-radius: 14px;
+      border: 2px solid #004488;
+      padding: 1.2vh 1vw;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .info-title {
+      color: #00ff66;
+      font-size: clamp(13px, 1.4vw, 24px);
+      font-weight: 700;
+      margin-bottom: 0.8vh;
+      letter-spacing: 2px;
+    }
+    .info-items { flex: 1; display: flex; flex-direction: column; gap: 0.4vh; overflow: hidden; }
+    .info-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.5vh 0.6vw;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(0,255,102,0.25);
+    }
+    .info-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #00ff66;
+      box-shadow: 0 0 8px #00ff66;
+      flex-shrink: 0;
+      animation: pulse-dot 2s infinite;
+    }
+    .info-text {
+      color: white; font-weight: 700;
+      font-size: clamp(12px, 1.2vw, 22px);
+    }
+
+    /* HORARIO */
+    .horario {
+      border-top: 1px solid rgba(255,255,255,0.15);
+      margin-top: 0.8vh; padding-top: 0.8vh;
+      text-align: center; font-weight: 700;
+    }
+    .horario-title { font-size: clamp(12px, 1.1vw, 20px); margin-bottom: 0.4vh; }
+    .horario-dia { font-size: clamp(11px, 1vw, 18px); color: #ffffff; }
+    .horario-hora-verde { font-size: clamp(11px, 1vw, 18px); color: #00ff66; margin-bottom: 0.3vh; }
+    .horario-hora-azul  { font-size: clamp(11px, 1vw, 18px); color: #00d9ff; }
+
+    /* ── TICKER ── */
+    .ticker-bar {
+      height: 4.5vh; min-height: 28px;
+      background: linear-gradient(90deg, #010e1e, #021528, #010e1e);
+      border-top: 2px solid #00ff6680;
+      overflow: hidden; display: flex; align-items: center; flex-shrink: 0;
+    }
+    .ticker-text {
+      white-space: nowrap;
+      font-size: clamp(12px, 1.3vw, 24px);
+      font-weight: 700; color: #00ff66;
+      animation: ticker 32s linear infinite;
+      padding-left: 100vw;
+      letter-spacing: 2px;
+    }
+
+    /* ESTADO CONEXIÓN */
+    .conn-status {
+      position: fixed; bottom: 5.5vh; right: 0.8vw;
+      font-size: clamp(9px, 0.8vw, 14px);
+      color: #00ff6680;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+
+    /* LOCK */
+    #lock-screen {
+      position: fixed; inset: 0;
+      background: #020c1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; gap: 20px;
+    }
+    #lock-screen h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ff66; font-size: clamp(18px, 3vw, 36px);
+      letter-spacing: 4px; text-shadow: 0 0 20px #00ff6660;
+    }
+    #lock-screen p { color: #8ab8d8; font-size: 14px; letter-spacing: 3px; }
+    #lock-input {
+      background: rgba(0,20,50,0.8);
+      border: 1px solid #00406680; border-radius: 10px;
+      color: #00ff66; font-family: 'Orbitron', sans-serif;
+      font-size: 20px; padding: 12px 24px; text-align: center;
+      outline: none; letter-spacing: 4px; width: 260px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #lock-input:focus { border-color: #00ff66; box-shadow: 0 0 16px #00ff6640; }
+    #lock-btn {
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6650; border-radius: 10px;
+      color: white; font-family: 'Orbitron', sans-serif;
+      font-size: 14px; letter-spacing: 3px; padding: 12px 36px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    #lock-btn:hover { box-shadow: 0 0 20px #00ff6640; transform: translateY(-1px); }
+    #lock-error { color: #ff4466; font-size: 13px; letter-spacing: 2px; min-height: 18px; }
+    #main-content { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <h2>🔒 GLORIUS EXCHANGE</h2>
+  <p>INGRESA LA CONTRASEÑA</p>
+  <input id="lock-input" type="password" placeholder="••••••••" maxlength="20"
+    onkeydown="if(event.key==='Enter') checkPass()" />
+  <button id="lock-btn" onclick="checkPass()">ENTRAR</button>
+  <div id="lock-error"></div>
+</div>
+
+<div id="main-content">
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-wrap">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" onerror="this.parentElement.innerHTML='GE'" />
+      </div>
+      <div>
+        <div class="title-main">CASA DE CAMBIO MONEY EXCHANGE</div>
+        <div class="title-sub">INTERNATIONAL S.R.L.</div>
+      </div>
+    </div>
+    <div class="clock-wrap">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="city">LA PAZ — BOLIVIA</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- TABLA -->
+    <div class="table-panel">
+      <div class="t-header">
+        <div class="t-col-m">MONEDA</div>
+        <div class="t-col-c">COMPRAMOS</div>
+        <div class="t-col-v">VENDEMOS</div>
+      </div>
+      <div class="rows" id="rows"></div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="right-panel">
+
+      <!-- VIDEO -->
+      <div class="tv-box">
+        <div class="tv-label">📺 TV EN VIVO</div>
+        <div class="tv-frame" id="tv-frame">
+          <iframe id="tv-iframe" src="about:blank"
+            allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <!-- INFO MERCADO -->
+      <div class="info-box">
+        <div class="info-title">📊 INFORMACIÓN DEL MERCADO</div>
+        <div class="info-items" id="info-items">
+          <!-- se llena desde Firebase -->
+        </div>
+        <div class="horario">
+          <div class="horario-title">🕒 HORARIO DE ATENCIÓN</div>
+          <div class="horario-dia">LUNES A VIERNES</div>
+          <div class="horario-hora-verde">09:00 – 18:30</div>
+          <div class="horario-dia">SÁBADO</div>
+          <div class="horario-hora-azul">09:00 – 13:00</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker-bar">
+    <div class="ticker-text" id="ticker-text">
+      ● DÓLAR ESTABLE EN EL MERCADO INTERNACIONAL &nbsp;&nbsp;&nbsp;
+      ● EURO MANTIENE TENDENCIA ALCISTA &nbsp;&nbsp;&nbsp;
+      ● TASAS ACTUALIZADAS EN TIEMPO REAL &nbsp;&nbsp;&nbsp;
+      ● GLORIUS EXCHANGE FINANCIAL SYSTEM &nbsp;&nbsp;&nbsp;
+      ● TRANSACCIONES SEGURAS Y RÁPIDAS &nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+<div class="conn-status" id="conn-status">● CONECTANDO...</div>
+</div><!-- /main-content -->
+
+<!-- LOCK JS -->
+<script>
+  const DISPLAY_PASS = "glorius2025";
+  function checkPass() {
+    const val = document.getElementById("lock-input").value;
+    if (val === DISPLAY_PASS) {
+      document.getElementById("lock-screen").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+    } else {
+      const err = document.getElementById("lock-error");
+      err.textContent = "✖ CONTRASEÑA INCORRECTA";
+      document.getElementById("lock-input").value = "";
+      setTimeout(() => err.textContent = "", 2000);
+    }
+  }
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, onSnapshot, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCH6dGdnadvvKRza1w4oTVV-_B5QVzIwC4",
+    authDomain: "glorius-exchange-web.firebaseapp.com",
+    projectId: "glorius-exchange-web",
+    storageBucket: "glorius-exchange-web.firebasestorage.app",
+    messagingSenderId: "1023043827000",
+    appId: "1:1023043827000:web:6f5fcb30859d8e9d27bdcd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── RELOJ ──
+  function tick() {
+    const n = new Date();
+    document.getElementById("clock").textContent =
+      String(n.getHours()).padStart(2,"0")   + ":" +
+      String(n.getMinutes()).padStart(2,"0") + ":" +
+      String(n.getSeconds()).padStart(2,"0");
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ── MONEDAS ──
+  const rowsEl = document.getElementById("rows");
+  let rowsBuilt = false;
+  let monedaMap = {}; // code -> elementos DOM
+
+  onSnapshot(query(collection(db, "monedas"), orderBy("orden")), (snap) => {
+    const monedas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    document.getElementById("conn-status").textContent = "● EN VIVO";
+    document.getElementById("conn-status").style.color = "#00ff66";
+
+    if (!rowsBuilt) {
+      rowsEl.innerHTML = "";
+      monedas.forEach((m, i) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.id = "row-" + m.id;
+        row.innerHTML = `
+          <div class="coin-cell">
+            <div class="num">${i + 1}</div>
+            <div class="flag">
+              <img src="${m.bandera || ''}" alt="${m.codigo}"
+                onerror="this.style.display='none'" />
+            </div>
+            <div>
+              <div style="display:flex;align-items:baseline;gap:0.5vw;">
+                <span class="coin-code">${m.codigo}</span>
+                <span class="coin-name">${m.nombre}</span>
+              </div>
+              <div class="live-tag">LIVE MARKET</div>
+            </div>
+          </div>
+          <div class="price-box">
+            <div class="price-val" id="compra-${m.id}">${m.compra}</div>
+          </div>
+          <div class="price-box">
+            <div class="price-val" id="venta-${m.id}">${m.venta}</div>
+          </div>
+        `;
+        rowsEl.appendChild(row);
+      });
+      rowsBuilt = true;
+    } else {
+      // actualizar precios con flash
+      monedas.forEach(m => {
+        const cEl = document.getElementById("compra-" + m.id);
+        const vEl = document.getElementById("venta-"  + m.id);
+        const row = document.getElementById("row-"    + m.id);
+        if (cEl && cEl.textContent !== String(m.compra)) {
+          cEl.textContent = m.compra;
+          row?.classList.remove("updated");
+          void row?.offsetWidth;
+          row?.classList.add("updated");
+        }
+        if (vEl && vEl.textContent !== String(m.venta)) {
+          vEl.textContent = m.venta;
+        }
+      });
+    }
+  });
+
+  // ── VIDEO ──
+  let currentVideoUrl = "";
+  onSnapshot(doc(db, "configuracion", "video"), (snap) => {
+    if (!snap.exists()) return;
+    const url = snap.data().url || "";
+    if (url && url !== currentVideoUrl) {
+      currentVideoUrl = url;
+      const container = document.getElementById("tv-frame");
+      container.innerHTML = `<iframe src="${url}"
+        style="width:100%;height:100%;border:none;display:block"
+        allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    }
+  });
+
+  // ── INFO MERCADO ──
+  onSnapshot(collection(db, "info_mercado"), (snap) => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const el = document.getElementById("info-items");
+    el.innerHTML = "";
+    items.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "info-item";
+      div.innerHTML = `
+        <div class="info-dot"></div>
+        <span class="info-text">${m.texto || ""}</span>
+      `;
+      el.appendChild(div);
+    });
+  });
+
+  // ── TICKER ──
+  onSnapshot(doc(db, "configuracion", "ticker"), (snap) => {
+    if (snap.exists() && snap.data().texto) {
+      document.getElementById("ticker-text").textContent = snap.data().texto;
+    }
+  });
+
+  // fullscreen al click
+  document.body.addEventListener("click", () => {
+    if (!document.fullscreenElement)
+      document.documentElement.requestFullscreen().catch(() => {});
+  });
+</script>
+</body>
+</html>

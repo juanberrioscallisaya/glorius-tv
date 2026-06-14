@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glorius Exchange — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #020c1a;
+      color: white;
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      padding: 24px 20px 40px;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #00ff66;
+      font-size: clamp(18px, 2.5vw, 34px);
+      text-shadow: 0 0 20px #00ff6660;
+      letter-spacing: 3px;
+      margin-bottom: 4px;
+    }
+    .subtitle { color: #8ab8d8; font-size: 13px; letter-spacing: 3px; margin-bottom: 18px; }
+
+    .status {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,255,102,0.08);
+      border: 1px solid #00ff6640;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px; color: #00ff66;
+      letter-spacing: 2px; margin-bottom: 24px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #00ff66; box-shadow: 0 0 8px #00ff66;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px; color: #00d9ff;
+      letter-spacing: 4px; margin-bottom: 12px; margin-top: 28px;
+    }
+
+    /* ── TABLA PRECIOS ── */
+    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+    .price-table th {
+      background: linear-gradient(90deg, #021830, #031f40);
+      color: #a0c8e8; font-size: 12px; letter-spacing: 3px;
+      padding: 10px 12px; text-align: left;
+      border-bottom: 1px solid #00406680;
+    }
+    .price-table th:nth-child(2),
+    .price-table th:nth-child(3) { text-align: center; }
+
+    .money-row { border-bottom: 1px solid #ffffff08; transition: background 0.2s; }
+    .money-row:hover { background: rgba(0,255,102,0.04); }
+    .money-row:nth-child(even) { background: rgba(0,60,120,0.08); }
+    .money-row td { padding: 6px 8px; vertical-align: middle; }
+
+    .flag-cell { display: flex; align-items: center; gap: 10px; }
+    .flag-img {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+      object-fit: cover; flex-shrink: 0;
+    }
+    .code-label { font-family: 'Orbitron', sans-serif; color: #00ff66; font-size: 14px; font-weight: 700; }
+    .name-label { color: #8ab8d8; font-size: 12px; font-weight: 600; }
+
+    .price-input {
+      width: 100%;
+      background: rgba(0,20,50,0.8);
+      border: 1px solid #00406680; border-radius: 8px;
+      color: #00ff66; font-family: 'Orbitron', sans-serif;
+      font-size: 15px; font-weight: 700;
+      padding: 8px 10px; text-align: center; outline: none;
+      letter-spacing: 1px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .price-input:focus { border-color: #00ff66; box-shadow: 0 0 12px #00ff6640; }
+    .price-input.venta { color: #00d9ff; }
+    .price-input.venta:focus { border-color: #00d9ff; box-shadow: 0 0 12px #00d9ff40; }
+
+    .btn-ok {
+      width: 56px;
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6650; border-radius: 8px;
+      color: white; font-family: 'Orbitron', sans-serif;
+      font-size: 10px; letter-spacing: 1px;
+      padding: 7px 0; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ok:hover { background: linear-gradient(135deg, #007a28, #00a035); box-shadow: 0 0 12px #00ff6640; }
+    .btn-ok.saved { background: linear-gradient(135deg, #004080, #005aaa); border-color: #00d9ff50; color: #00d9ff; }
+
+    .btn-save-all {
+      display: block; width: 100%; max-width: 420px;
+      margin: 16px auto 0;
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6660; border-radius: 12px;
+      color: white; font-family: 'Orbitron', sans-serif;
+      font-size: 15px; font-weight: 700; letter-spacing: 3px;
+      padding: 14px; cursor: pointer;
+      box-shadow: 0 0 20px #00ff6630; transition: all 0.2s;
+    }
+    .btn-save-all:hover { box-shadow: 0 0 30px #00ff6660; transform: translateY(-1px); }
+
+    /* ── VIDEO ── */
+    .video-wrap { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .video-controls { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+    .video-preview {
+      flex: 0 0 320px; aspect-ratio: 16/9;
+      border-radius: 10px; overflow: hidden;
+      border: 2px solid #00ff6640;
+    }
+    .video-preview iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    .generic-input {
+      width: 100%;
+      background: rgba(0,20,50,0.8);
+      border: 1px solid #00406680; border-radius: 8px;
+      color: #e0f0ff; font-family: 'Rajdhani', sans-serif;
+      font-size: 15px; font-weight: 700;
+      padding: 10px 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .generic-input:focus { border-color: #00ff66; box-shadow: 0 0 10px #00ff6630; }
+
+    .btn-sec {
+      background: rgba(0,60,120,0.5);
+      border: 1px solid #00406680; border-radius: 10px;
+      color: #00d9ff; font-family: 'Orbitron', sans-serif;
+      font-size: 12px; letter-spacing: 2px;
+      padding: 10px 20px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sec:hover { border-color: #00d9ff; box-shadow: 0 0 12px #00d9ff30; }
+
+    /* ── INFO MERCADO ── */
+    .info-item-admin {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; margin-bottom: 8px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(0,255,102,0.25);
+    }
+    .info-dot { width: 10px; height: 10px; border-radius: 50%; background: #00ff66; box-shadow: 0 0 8px #00ff66; flex-shrink: 0; }
+    .info-input {
+      flex: 1; font-size: 16px;
+      background: transparent; border: none; outline: none;
+      color: white; font-weight: 700;
+      font-family: 'Rajdhani', sans-serif;
+    }
+    .info-save-btn {
+      background: rgba(0,60,120,0.6);
+      border: 1px solid #00406680; border-radius: 8px;
+      color: #00ff66; font-family: 'Orbitron', sans-serif;
+      font-size: 10px; letter-spacing: 1px;
+      padding: 5px 10px; cursor: pointer; white-space: nowrap;
+    }
+    .info-save-btn:hover { border-color: #00ff66; }
+
+    /* ── TICKER ── */
+    .ticker-input {
+      width: 100%;
+      background: rgba(0,20,50,0.8);
+      border: 1px solid #00406680; border-radius: 8px;
+      color: #00ff66; font-family: 'Rajdhani', sans-serif;
+      font-size: 15px; font-weight: 700;
+      padding: 10px 14px; outline: none; letter-spacing: 1px;
+      transition: border-color 0.2s;
+    }
+    .ticker-input:focus { border-color: #00ff66; box-shadow: 0 0 10px #00ff6630; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6660; border-radius: 12px;
+      color: white; font-family: 'Orbitron', sans-serif;
+      font-size: 13px; letter-spacing: 2px;
+      padding: 14px 24px;
+      box-shadow: 0 0 30px #00ff6640;
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.3s; z-index: 999; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 600px) {
+      .video-preview { flex: 0 0 100%; }
+    }
+
+    /* ── LOCK ── */
+    #lock-screen {
+      position: fixed; inset: 0; background: #020c1a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999; gap: 20px;
+    }
+    #lock-screen h2 {
+      font-family: 'Orbitron', sans-serif; color: #00ff66;
+      font-size: clamp(18px, 3vw, 32px); letter-spacing: 4px;
+      text-shadow: 0 0 20px #00ff6660;
+    }
+    #lock-screen p { color: #8ab8d8; font-size: 13px; letter-spacing: 2px; }
+    #lock-input {
+      background: rgba(0,20,50,0.8); border: 1px solid #00406680;
+      border-radius: 10px; color: #00ff66;
+      font-family: 'Orbitron', sans-serif; font-size: 20px;
+      padding: 12px 24px; text-align: center; outline: none;
+      letter-spacing: 4px; width: 260px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    #lock-input:focus { border-color: #00ff66; box-shadow: 0 0 16px #00ff6640; }
+    #lock-btn {
+      background: linear-gradient(135deg, #005a1e, #007a28);
+      border: 1px solid #00ff6650; border-radius: 10px;
+      color: white; font-family: 'Orbitron', sans-serif;
+      font-size: 14px; letter-spacing: 3px; padding: 12px 36px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    #lock-btn:hover { box-shadow: 0 0 20px #00ff6640; transform: translateY(-1px); }
+    #lock-error { color: #ff4466; font-size: 13px; letter-spacing: 2px; min-height: 18px; }
+    #main-content { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <h2>🔒 ACCESO ADMIN</h2>
+  <p>INGRESA LA CONTRASEÑA</p>
+  <input id="lock-input" type="password" placeholder="••••••••" maxlength="20"
+    onkeydown="if(event.key==='Enter') checkPass()" />
+  <button id="lock-btn" onclick="checkPass()">ENTRAR</button>
+  <div id="lock-error"></div>
+</div>
+
+<div id="main-content">
+  <h1>GLORIUS EXCHANGE</h1>
+  <div class="subtitle">PANEL DE ADMINISTRACIÓN</div>
+  <div class="status"><div class="status-dot"></div><span id="status-txt">CONECTANDO...</span></div>
+
+  <!-- PRECIOS -->
+  <div class="section-title">💱 Precios de Cambio</div>
+  <table class="price-table">
+    <thead>
+      <tr>
+        <th>MONEDA</th>
+        <th>COMPRA</th>
+        <th>VENTA</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="price-tbody"></tbody>
+  </table>
+  <button class="btn-save-all" onclick="saveAll()">💾 GUARDAR TODOS LOS PRECIOS</button>
+
+  <!-- VIDEO -->
+  <div class="section-title">📺 Video YouTube (TV en Vivo)</div>
+  <div class="video-wrap">
+    <div class="video-controls">
+      <label style="color:#8ab8d8;font-size:13px;letter-spacing:2px;">LINK DE YOUTUBE</label>
+      <input class="generic-input" id="video-url" placeholder="https://www.youtube.com/watch?v=..." />
+      <button class="btn-sec" style="margin-top:6px" onclick="saveVideo()">▶ GUARDAR Y APLICAR VIDEO</button>
+    </div>
+    <div class="video-preview">
+      <iframe id="video-preview-iframe" src="about:blank"
+        allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- INFO MERCADO -->
+  <div class="section-title">📊 Información del Mercado</div>
+  <div id="info-mercado-list">
+    <!-- se llena desde Firebase -->
+  </div>
+
+  <!-- TICKER -->
+  <div class="section-title">📡 Texto del Ticker</div>
+  <input class="ticker-input" id="ticker-inp" placeholder="Texto corriente del pie de página..." />
+  <br>
+  <button class="btn-sec" style="margin-top:10px;" onclick="saveTicker()">GUARDAR TICKER</button>
+
+  <div class="toast" id="toast">✔ GUARDADO</div>
+</div><!-- /main-content -->
+
+<!-- LOCK JS -->
+<script>
+  const ADMIN_PASS = "glorius2025";
+  function checkPass() {
+    const val = document.getElementById("lock-input").value;
+    if (val === ADMIN_PASS) {
+      document.getElementById("lock-screen").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+    } else {
+      const err = document.getElementById("lock-error");
+      err.textContent = "✖ CONTRASEÑA INCORRECTA";
+      document.getElementById("lock-input").value = "";
+      setTimeout(() => err.textContent = "", 2000);
+    }
+  }
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc,
+           onSnapshot, updateDoc, setDoc, getDoc, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCH6dGdnadvvKRza1w4oTVV-_B5QVzIwC4",
+    authDomain: "glorius-exchange-web.firebaseapp.com",
+    projectId: "glorius-exchange-web",
+    storageBucket: "glorius-exchange-web.firebasestorage.app",
+    messagingSenderId: "1023043827000",
+    appId: "1:1023043827000:web:6f5fcb30859d8e9d27bdcd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── UTILIDAD TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+
+  // ── CONVERTIR YOUTUBE ──
+  function toEmbed(url) {
+    try {
+      if (url.includes("/embed/")) return url;
+      let id = "";
+      if (url.includes("watch?v="))  id = url.split("v=")[1].split("&")[0];
+      else if (url.includes("youtu.be/")) id = url.split("youtu.be/")[1].split("?")[0];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
+    } catch { return url; }
+  }
+
+  // ── MONEDAS ──
+  let monedasData = [];
+
+  onSnapshot(query(collection(db, "monedas"), orderBy("orden")), (snap) => {
+    monedasData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    document.getElementById("status-txt").textContent = "CONECTADO ● EN VIVO";
+
+    const tbody = document.getElementById("price-tbody");
+    // sólo redibujar si no hay filas aún
+    if (tbody.children.length === 0) {
+      monedasData.forEach(m => {
+        const tr = document.createElement("tr");
+        tr.className = "money-row";
+        tr.innerHTML = `
+          <td>
+            <div class="flag-cell">
+              <img class="flag-img" src="${m.bandera || ''}" alt="${m.codigo}"
+                onerror="this.style.display='none'" />
+              <div>
+                <div class="code-label">${m.codigo}</div>
+                <div class="name-label">${m.nombre}</div>
+              </div>
+            </div>
+          </td>
+          <td><input class="price-input" id="in-compra-${m.id}" value="${m.compra}" /></td>
+          <td><input class="price-input venta" id="in-venta-${m.id}" value="${m.venta}" /></td>
+          <td>
+            <button class="btn-ok" onclick="saveOne('${m.id}')">OK</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      // actualizar valores si cambiaron desde otro lado
+      monedasData.forEach(m => {
+        const ci = document.getElementById("in-compra-" + m.id);
+        const vi = document.getElementById("in-venta-"  + m.id);
+        if (ci && document.activeElement !== ci) ci.value = m.compra;
+        if (vi && document.activeElement !== vi) vi.value = m.venta;
+      });
+    }
+  });
+
+  // guardar una moneda
+  window.saveOne = async function(id) {
+    const compra = document.getElementById("in-compra-" + id).value;
+    const venta  = document.getElementById("in-venta-"  + id).value;
+    try {
+      await updateDoc(doc(db, "monedas", id), { compra, venta });
+      const btn = event.target;
+      btn.textContent = "✔"; btn.classList.add("saved");
+      setTimeout(() => { btn.textContent = "OK"; btn.classList.remove("saved"); }, 1500);
+      showToast("✔ PRECIO GUARDADO");
+    } catch(e) { console.error(e); }
+  };
+
+  // guardar todas
+  window.saveAll = async function() {
+    try {
+      const promises = monedasData.map(m => {
+        const compra = document.getElementById("in-compra-" + m.id)?.value;
+        const venta  = document.getElementById("in-venta-"  + m.id)?.value;
+        if (compra === undefined) return Promise.resolve();
+        return updateDoc(doc(db, "monedas", m.id), { compra, venta });
+      });
+      await Promise.all(promises);
+      showToast("✔ TODOS LOS PRECIOS GUARDADOS");
+    } catch(e) { console.error(e); }
+  };
+
+  // ── VIDEO ──
+  onSnapshot(doc(db, "configuracion", "video"), (snap) => {
+    if (!snap.exists()) return;
+    const url = snap.data().url || "";
+    const inp  = document.getElementById("video-url");
+    const prev = document.getElementById("video-preview-iframe");
+    if (document.activeElement !== inp) inp.value = url;
+    if (prev.src !== url) prev.src = url;
+  });
+
+  window.saveVideo = async function() {
+    const raw = document.getElementById("video-url").value.trim();
+    if (!raw) return;
+    const url = toEmbed(raw);
+    try {
+      await setDoc(doc(db, "configuracion", "video"), { url });
+      document.getElementById("video-preview-iframe").src = url;
+      showToast("✔ VIDEO ACTUALIZADO");
+    } catch(e) { console.error(e); }
+  };
+
+  // ── INFO MERCADO ──
+  onSnapshot(collection(db, "info_mercado"), (snap) => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const list  = document.getElementById("info-mercado-list");
+
+    // reconstruir solo si cambió la cantidad
+    if (list.children.length !== items.length) {
+      list.innerHTML = "";
+      items.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "info-item-admin";
+        div.innerHTML = `
+          <div class="info-dot"></div>
+          <input class="info-input" id="info-${m.id}" value="${m.texto || ''}"
+            placeholder="Escribe información..." />
+          <button class="info-save-btn" onclick="saveInfo('${m.id}')">GUARDAR</button>
+        `;
+        list.appendChild(div);
+      });
+    } else {
+      items.forEach(m => {
+        const inp = document.getElementById("info-" + m.id);
+        if (inp && document.activeElement !== inp) inp.value = m.texto || "";
+      });
+    }
+  });
+
+  window.saveInfo = async function(id) {
+    const texto = document.getElementById("info-" + id).value;
+    try {
+      await updateDoc(doc(db, "info_mercado", id), { texto });
+      showToast("✔ INFO GUARDADA");
+    } catch(e) { console.error(e); }
+  };
+
+  // ── TICKER ──
+  onSnapshot(doc(db, "configuracion", "ticker"), (snap) => {
+    if (!snap.exists()) return;
+    const inp = document.getElementById("ticker-inp");
+    if (document.activeElement !== inp) inp.value = snap.data().texto || "";
+  });
+
+  window.saveTicker = async function() {
+    const texto = document.getElementById("ticker-inp").value;
+    try {
+      await setDoc(doc(db, "configuracion", "ticker"), { texto });
+      showToast("✔ TICKER GUARDADO");
+    } catch(e) { console.error(e); }
+  };
+</script>
+</body>
+</html>
