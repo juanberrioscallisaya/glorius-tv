@@ -492,7 +492,7 @@
   let rowsBuilt = false;
   let monedaMap = {}; // code -> elementos DOM
 
-  onSnapshot(query(collection(db, "monedas"), orderBy("orden")), (snap) => {
+  onSnapshot(query(collection(db, "monedas"), orderBy("ordencorrelativo")), (snap) => {
     const monedas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     document.getElementById("conn-status").textContent = "● EN VIVO";
