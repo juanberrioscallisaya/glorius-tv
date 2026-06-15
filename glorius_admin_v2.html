@@ -345,7 +345,7 @@
   // ── MONEDAS ──
   let monedasData = [];
 
-  onSnapshot(query(collection(db, "monedas"), orderBy("orden")), (snap) => {
+  onSnapshot(query(collection(db, "monedas"), orderBy("ordencorrelativo")), (snap) => {
     monedasData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     document.getElementById("status-txt").textContent = "CONECTADO ● EN VIVO";
