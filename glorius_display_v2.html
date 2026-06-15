@@ -141,6 +141,10 @@
       text-shadow: 0 0 20px #ffffff70;
       letter-spacing: 4px;
       line-height: 1;
+      font-variant-numeric: tabular-nums;
+      min-width: clamp(180px, 20vw, 380px);
+      display: inline-block;
+      text-align: right;
     }
     .city {
       color: #00ff66;
@@ -172,7 +176,7 @@
     }
 
     .t-header {
-      display: grid; grid-template-columns: 2.4fr 0.85fr 0.85fr;
+      display: grid; grid-template-columns: 2.2fr 0.7fr 0.7fr;
       background: linear-gradient(90deg, #011626, #032040, #011626);
       padding: 1vh 1vw;
       font-weight: 700; align-items: center;
@@ -191,7 +195,7 @@
 
     .rows { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .row {
-      display: grid; grid-template-columns: 2.4fr 0.85fr 0.85fr;
+      display: grid; grid-template-columns: 2.2fr 0.7fr 0.7fr;
       align-items: center;
       border-top: 1px solid #ffffff08;
       flex: 1;
@@ -203,11 +207,11 @@
     .coin-cell { display: flex; align-items: center; gap: 0.7vw; padding-left: 0.7vw; }
     .num {
       color: #3a8a5c; font-weight: 700;
-      font-size: clamp(12px, 1.4vw, 26px);
-      width: 1.6vw; flex-shrink: 0; text-align: center;
+      font-size: clamp(14px, 1.6vw, 30px);
+      width: 1.8vw; flex-shrink: 0; text-align: center;
     }
     .flag {
-      width: clamp(36px, 5vh, 70px); height: clamp(36px, 5vh, 70px);
+      width: clamp(32px, 4.5vh, 62px); height: clamp(32px, 4.5vh, 62px);
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,0.2);
       overflow: hidden; flex-shrink: 0;
@@ -216,14 +220,14 @@
     .flag img { width: 100%; height: 100%; object-fit: cover; }
     .coin-code {
       color: #00ff66; font-weight: 700;
-      font-size: clamp(14px, 2vw, 38px);
+      font-size: clamp(15px, 2vw, 38px);
       font-family: 'Orbitron', sans-serif;
       text-shadow: 0 0 10px #00ff6640;
-      min-width: clamp(55px, 7vw, 120px);
+      min-width: clamp(60px, 8vw, 130px);
     }
     .coin-name {
       color: #daeeff;
-      font-size: clamp(16px, 2.5vw, 46px);
+      font-size: clamp(16px, 2.4vw, 44px);
       font-weight: 700;
       letter-spacing: 1px;
     }
@@ -233,12 +237,12 @@
       letter-spacing: 2px; margin-top: 1px;
     }
 
-    .price-box { display: flex; justify-content: center; padding: 3px 6px; }
+    .price-box { display: flex; justify-content: center; padding: 3px 14px; }
     .price-val {
-      width: 94%; height: clamp(32px, 4.8vh, 64px);
+      width: 100%; height: clamp(32px, 4.8vh, 64px);
       border-radius: 10px;
       text-align: center; font-weight: 700;
-      font-size: clamp(15px, 2.1vw, 40px);
+      font-size: clamp(16px, 2.2vw, 42px);
       font-family: 'Orbitron', sans-serif;
       letter-spacing: 1px;
       display: flex; align-items: center; justify-content: center;
@@ -259,7 +263,7 @@
 
     /* ── PANEL DERECHO ── */
     .right-panel {
-      width: clamp(280px, 32vw, 620px);
+      width: clamp(420px, 46vw, 860px);
       flex-shrink: 0;
       display: flex; flex-direction: column; gap: 0.6vh;
     }
