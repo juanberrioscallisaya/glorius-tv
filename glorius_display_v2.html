@@ -623,7 +623,7 @@
   const rowsEl = document.getElementById("rows");
   let rowsBuilt = false;
 
-  onSnapshot(query(collection(db, "monedas"), orderBy("ordencorrelativo")), (snap) => {
+  onSnapshot(query(collection(db, "monedas"), orderBy("ordencorrelativo_num")), (snap) => {
     const monedas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     document.getElementById("conn-status").textContent = "● EN VIVO";
